@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>福智高中 學年活動月覽</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#faf8f4;--card:#fff;--tx:#2b2a28;--mut:#8a867e;--ln:#e8e3d9;--chip:#efeae0;
+--exam:#d9534f;--phys:#e8913a;--home:#4a8bd4;--event:#4aa67a}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1c1b19;--card:#262522;--tx:#eee9e0;--mut:#a09b90;--ln:#3a3834;--chip:#33312d}}
+:root[data-theme="dark"]{--bg:#1c1b19;--card:#262522;--tx:#eee9e0;--mut:#a09b90;--ln:#3a3834;--chip:#33312d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 -apple-system,"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif;padding:14px 14px 40px;max-width:640px;margin:0 auto}
+h1{font-size:19px;margin:6px 0 2px}
+.sub{color:var(--mut);font-size:13px;margin-bottom:12px}
+.row{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}
+.row::-webkit-scrollbar{display:none}
+button{border:0;background:var(--chip);color:var(--tx);padding:7px 13px;border-radius:99px;font:inherit;font-size:14px;white-space:nowrap;cursor:pointer}
+button.on{background:var(--tx);color:var(--bg)}
+.leg{display:flex;gap:12px;flex-wrap:wrap;font-size:13px;color:var(--mut);margin:2px 0 12px}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}
+.m{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:14px;margin-bottom:14px}
+.m h2{font-size:18px;margin:0 0 8px;display:flex;align-items:center;gap:8px}
+.tag{font-size:12px;background:var(--tx);color:var(--bg);padding:1px 8px;border-radius:99px;font-weight:400}
+.e{display:flex;gap:10px;padding:9px 0;border-top:1px solid var(--ln)}
+.e:first-of-type{border-top:0}
+.e.past{opacity:.45}
+.d{min-width:64px;font-weight:600;font-size:15px}
+.d small{display:block;font-weight:400;color:var(--mut);font-size:12px}
+.bar{width:4px;border-radius:4px;flex:none}
+.t{flex:1}
+.g{font-size:12px;color:var(--mut)}
+.none{color:var(--mut);font-size:14px;padding:6px 0}
+</style></head><body>
+<h1>福智高中 學年活動月覽</h1>
+<div class="sub">看這個月、下個月有哪些重大活動</div>
+<div class="row" id="grp"></div>
+<div class="row" id="mon"></div>
+<div class="leg"><span><i class="dot" style="background:var(--exam)"></i>考試</span><span><i class="dot" style="background:var(--phys)"></i>體力／勤務</span><span><i class="dot" style="background:var(--home)"></i>返校返鄉</span><span><i class="dot" style="background:var(--event)"></i>其他活動</span></div>
+<div id="out"></div>
+<script>
+const G={J:'國一二',K:'國三',H:'高一二',S:'高三'};
+// [月,起日,迄日,內容,類型,年段(空=全校)]
+const E=[
+[8,16,16,'全校返校日','home',''],
+[9,2,2,'學生返校','home',''],[9,4,5,'模考 I（開學即考）','exam','S'],[9,5,5,'校園環境整理','phys',''],[9,8,9,'模考 I','exam','K'],
+[10,6,7,'定期評量 I','exam',''],[10,7,11,'期中返鄉（7日中午起，11日下午返校）','home',''],[10,17,17,'學測英聽（一）','exam','S'],[10,28,29,'模考 II','exam','S'],[10,31,31,'憶師恩法會（林口，整日出車）','phys',''],
+[11,21,21,'全校路跑','phys',''],
+[12,2,3,'定期評量 II','exam',''],[12,8,9,'模考 III','exam','S'],[12,12,12,'學測英聽（二）','exam','S'],[12,12,13,'圓根燈會（場地佈置與勤務）','phys',''],[12,19,19,'懇親會','event',''],[12,23,24,'模考 II','exam','K'],
+[1,16,16,'期末大掃除','phys',''],[1,21,22,'定期評量 III','exam','JKH'],[1,22,24,'全國學測','exam','S'],[1,23,23,'學生返鄉（寒假開始）','home',''],[1,24,24,'親職教育營','event','S'],
+[2,22,22,'學生返校','home',''],[2,25,26,'高二模考','exam','H'],[2,25,25,'學測成績公布','event','S'],[2,28,28,'校園環境整理','phys',''],
+[3,3,4,'模考 I','exam','K'],[3,4,4,'繁星撕榜','event','S'],[3,6,6,'繁星撕榜','event','S'],[3,8,8,'多益考試','exam','S'],[3,11,12,'繁星報名','event','S'],[3,15,28,'拔河比賽週','phys',''],[3,18,18,'繁星放榜','event','S'],[3,23,25,'個申報名','event','S'],
+[4,1,2,'定期評量 I','exam',''],[4,2,6,'期中返鄉（2日下午起，6日返校）','home',''],[4,9,9,'分科模考','exam','S'],[4,14,15,'華山挑戰賽暨生態之旅（國一忠）','phys','J'],[4,16,16,'全校運動會','phys',''],[4,21,22,'模考 II','exam','K'],[4,21,22,'畢業考','exam','S'],[4,22,22,'攀岩半日（國一忠）','phys','J'],[4,22,24,'東卯山登山暨單車（國二忠）','phys','J'],[4,29,30,'東卯山登山暨單車（國二仁愛，續至 5/1）','phys','J'],
+[5,1,1,'東卯山登山暨單車（國二仁愛）最後一天','phys','J'],[5,5,6,'畢業考','exam','K'],[5,14,15,'定期評量 II','exam',''],[5,16,17,'國中會考','exam','K'],[5,23,23,'懇親會','event',''],[5,27,27,'溯溪（國三忠孝）','phys','K'],[5,29,29,'前科大正備取公告','event','S'],
+[6,3,16,'分科報名','event','S'],[6,5,5,'會考成績公布','event','K'],[6,6,6,'畢業典禮、希望季（展演／勤務）','phys',''],[6,9,10,'華山挑戰賽暨生態之旅（國一仁愛）','phys','J'],[6,11,11,'個申分發放榜','event','S'],[6,16,16,'攀岩半日（國一仁愛）','phys','J'],[6,19,19,'龍舟賽（國二忠仁愛）','phys','J'],[6,20,20,'期末環境大掃除','phys','JH'],[6,24,25,'定期評量 III','exam','JH'],[6,27,27,'暑假學生返鄉','home',''],
+[7,7,7,'免試／獨招放榜','event','K'],[7,11,12,'分科測驗','exam','S']
+];
+const order=[8,9,10,11,12,1,2,3,4,5,6,7];
+const yr=m=>m>=8?2026:2027;
+const wd='日一二三四五六';
+let grp='',view='now';
+const now=new Date();let cm=now.getMonth()+1;
+const cur=(y=>now.getFullYear()===y.y)?0:0;
+// 以今天所在月份為「本月」；學年外則從 8 月起
+const curM=order.includes(cm)?cm:8;
+function fmt(m,d){const w=wd[new Date(yr(m),m-1,d).getDay()];return `${m}/${d}（${w}）`}
+function card(m,tag){
+ const list=E.filter(e=>e[0]===m&&(!grp||!e[5]||e[5].includes(grp))).sort((a,b)=>a[1]-b[1]);
+ let h=`<div class="m"><h2>${m} 月${tag?`<span class="tag">${tag}</span>`:''}</h2>`;
+ if(!list.length)h+=`<div class="none">${'本月沒有重大活動（緩衝期）'}</div>`;
+ const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+ list.forEach(e=>{
+  const end=new Date(yr(m),m-1,e[2]);const past=end<today;
+  const date=e[1]===e[2]?fmt(m,e[1]):`${m}/${e[1]}–${e[2]!==e[1]?e[2]:''}`;
+  const sub=e[1]===e[2]?'':`<small>${wd[new Date(yr(m),m-1,e[1]).getDay()]}～${wd[new Date(yr(m),m-1,e[2]).getDay()]}</small>`;
+  const gl=e[5]?[...e[5]].map(k=>G[k]).join('、'):'';
+  h+=`<div class="e${past?' past':''}"><div class="bar" style="background:var(--${e[4]})"></div><div class="d">${date}${sub}</div><div class="t">${e[3]}${gl?`<div class="g">${gl}</div>`:''}</div></div>`;
+ });
+ return h+'</div>';
+}
+function render(){
+ let h='';
+ if(view==='now'){const i=order.indexOf(curM);h=card(order[i],'本月')+(i<11?card(order[i+1],'下月'):'')}
+ else h=card(+view,'');
+ document.getElementById('out').innerHTML=h;
+ document.getElementById('grp').innerHTML=[['','全校'],...Object.entries(G)].map(([k,v])=>`<button class="${grp===k?'on':''}" data-g="${k}">${v}</button>`).join('');
+ document.getElementById('mon').innerHTML=`<button class="${view==='now'?'on':''}" data-m="now">本月＋下月</button>`+order.map(m=>`<button class="${view==m?'on':''}" data-m="${m}">${m}月</button>`).join('');
+}
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;
+ if(b.dataset.g!==undefined)grp=b.dataset.g;if(b.dataset.m)view=b.dataset.m;render()});
+render();
+</script></body></html>
